@@ -147,7 +147,7 @@ def handle_add_container(configuration, container):
             ip_address = dpath.util.get(container, 'NetworkSettings/IPAddress')
             logging.info('IP address : %s', ip_address)
             with open(os.path.join(configuration.hosts_dir, container['Id']), 'w') as f:
-                f.write('{1} {0}.docker.openwide.fr\n'.format(dpath.util.get(container, 'Name').replace('/', ''), ip_address))
+                f.write('{1} {0}.docker.openwide.fr\n'.format(dpath.util.get(container, 'Name').replace('/', '').replace('_', '-'), ip_address))
         except KeyError:
             logging.warn('No IP address on container %s (from %s)', container['Id'], container['Image'])
 

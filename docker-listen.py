@@ -16,6 +16,7 @@ import dpath
 from docker import Client
 
 DEFAULTS = {
+    'hosts_domain_name': 'docker.openwide.fr',
     'hosts_dir': '/etc/dnsmasq.d',
     'docker_url': 'unix://var/run/docker.sock',
     'sighup_enabled': 'True',
@@ -148,7 +149,7 @@ def handle_add_container(configuration, container):
             ip_address = dpath.util.get(container, 'NetworkSettings/IPAddress')
             logging.info('IP address : %s', ip_address)
             with open(os.path.join(configuration.hosts_dir, "docker-" + container['Id']), 'w') as f:
-                f.write('address=/{0}.docker.openwide.fr/{1}\n'.format(dpath.util.get(container, 'Name').replace('/', '').replace('_', '-'), ip_address))
+                f.write('address=/{0}.{2}/{1}\n'.format(dpath.util.get(container, 'Name').replace('/', '').replace('_', '-'), ip_address, configuration.hosts_domain_name))
         except KeyError:
             logging.warn('No IP address on container %s (from %s)', container['Id'], container['Image'])
 

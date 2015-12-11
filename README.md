@@ -32,8 +32,7 @@ Run the following command :
 
     sudo pex dpath docker-py -- docker-listen.py
 
-**WARN** : /etc/dnsmasq.d/docker-hosts will be cleared (all files deleted) each
-time process is started.
+**WARN** : /etc/dnsmasq.d/docker-* will be cleared each time process is started.
 
 **WARN** : sudo is required so that docker-listen can force dnsmasq to reload hosts
 (with a SIGHUP process signal)
@@ -49,6 +48,7 @@ command line option.
 Example :
 
     [docker-listen]
+    hosts_domain_name=docker.openwide.fr
     hosts_dir=/etc/dnsmasq.d
     docker_url=unix://var/run/docker.sock
     sighup_enabled=yes

@@ -21,17 +21,6 @@ Otherwise, you can use virtualenv and pip to prepare an isolated python env :
 
 `<python>` refers to an interpreter loaded with needed dépendencies.
 
-Dnsmasq configuration
-=====================
-
-You need to modify dnsmasq configuration to load the hosts declared by
-docker-listen.
-
-In your /etc/dnsmasq.conf, /etc/dnsmasq.d/docker.conf or 
-/etc/NetworkManager/dnsmasq.d/docker.conf, add an hosts_dir configuration
-
-    addn-hosts=/etc/dnsmasq.d/docker-hosts
-
 Running
 =======
 
@@ -60,7 +49,7 @@ command line option.
 Example :
 
     [docker-listen]
-    hosts_dir=/etc/dnsmasq.d/docker-hosts
+    hosts_dir=/etc/dnsmasq.d
     docker_url=unix://var/run/docker.sock
     sighup_enabled=yes
     sighup_process_name=dnsmasq

@@ -16,7 +16,7 @@ import dpath
 from docker import Client
 
 DEFAULTS = {
-    'hosts_dir': '/etc/dnsmasq.d/docker-hosts',
+    'hosts_dir': '/etc/dnsmasq.d',
     'docker_url': 'unix://var/run/docker.sock',
     'sighup_enabled': 'True',
     'sighup_process_name': 'dnsmasq',
@@ -96,9 +96,10 @@ def clean_all(configuration):
     try:
         files = os.listdir(configuration.hosts_dir)
         for f in files:
-            path = os.path.join(configuration.hosts_dir, f)
-            if os.path.isfile(path):
-                os.remove(path)
+            if f.startswith("docker-"):
+                path = os.path.join(configuration.hosts_dir, f)
+                if os.path.isfile(path):
+                    os.remove(path)
     except Exception:
         logging.exception('Error cleaning %s', configuration.hosts_dir)
 
@@ -133,9 +134,9 @@ def handle_stop(configuration, client, stop_event):
 
 def handle_stop_container(configuration, container_id):
     try:
-        files = os.listdir(configuration.hosts_dir)
-        if container_id in files:
-            os.remove(os.path.join(configuration.hosts_dir, container_id))
+        docker_file = os.path.join(configuration.hosts_dir, "docker-" + container_id)
+        if os.path.isfile(docker_file):
+            os.remove(docker_file)
         else:
             logging.warn('Host file not found for container %s ; delete ignored', container_id)
     except Exception:
@@ -146,8 +147,8 @@ def handle_add_container(configuration, container):
         try:
             ip_address = dpath.util.get(container, 'NetworkSettings/IPAddress')
             logging.info('IP address : %s', ip_address)
-            with open(os.path.join(configuration.hosts_dir, container['Id']), 'w') as f:
-                f.write('{1} {0}.docker.openwide.fr\n'.format(dpath.util.get(container, 'Name').replace('/', '').replace('_', '-'), ip_address))
+            with open(os.path.join(configuration.hosts_dir, "docker-" + container['Id']), 'w') as f:
+                f.write('address=/{0}.docker.openwide.fr/{1}\n'.format(dpath.util.get(container, 'Name').replace('/', '').replace('_', '-'), ip_address))
         except KeyError:
             logging.warn('No IP address on container %s (from %s)', container['Id'], container['Image'])
 

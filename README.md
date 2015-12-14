@@ -37,6 +37,13 @@ Run the following command :
 **WARN** : sudo is required so that docker-listen can force dnsmasq to reload hosts
 (with a SIGHUP process signal)
 
+Running as a service
+====================
+
+Copy the file ``pstart/docker-listen.conf`` in ``/etc/init``.
+
+Configure the path to docker-listen in ``/etc/init/docker-listen.conf`` and start the service with ``service docker-listen start``.
+
 Configuration
 =============
 

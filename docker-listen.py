@@ -21,7 +21,7 @@ DEFAULTS = {
     'docker_url': 'unix://var/run/docker.sock',
     'sighup_enabled': 'True',
     'sighup_process_name': 'dnsmasq',
-    'log_level': 'WARN'
+    'log_level': 'INFO'
 }
 
 def main(arguments):
@@ -77,13 +77,14 @@ def main(arguments):
     except Exception:
         logging.exception('Error communicating with docker socket %s. Stopping.', configuration.docker_url)
         return 2
+    logging.info('Docker-listen started')
     events = client.events(decode=True)
     os.umask(0000)
     clean_all(configuration)
     init_all(configuration, client)
     try:
         for event in events:
-            logging.info(event)
+            logging.debug(event)
             if event['status'] == 'start':
                 handle_start(configuration, client, event)
             elif event['status'] == 'kill':
@@ -95,6 +96,7 @@ def main(arguments):
 
 def clean_all(configuration):
     try:
+        logging.info('Cleaning dnsmasq configuration')
         files = os.listdir(configuration.hosts_dir)
         for f in files:
             if f.startswith("docker-"):
@@ -106,6 +108,7 @@ def clean_all(configuration):
 
 def sighup_dnsmasq(configuration):
     if configuration.sighup_enabled:
+        logging.info('Reloading dnsmasq configuration')
         os.system('killall -HUP \'%s\'' % (configuration.sighup_process_name, ))
 
 def init_all(configuration, client):
@@ -138,16 +141,17 @@ def handle_stop_container(configuration, container_id):
         docker_file = os.path.join(configuration.hosts_dir, "docker-" + container_id)
         if os.path.isfile(docker_file):
             os.remove(docker_file)
+            logging.info('%s dnsmasq file removed', docker_file)
         else:
             logging.warn('Host file not found for container %s ; delete ignored', container_id)
     except Exception:
         logging.exception('Unexpected error deleting host file for container %s', container_id)
 
 def handle_add_container(configuration, container):
-        logging.info(pprint.pformat(container))
+        logging.debug(pprint.pformat(container))
         try:
             ip_address = dpath.util.get(container, 'NetworkSettings/IPAddress')
-            logging.info('IP address : %s', ip_address)
+            logging.info('Container %s IP address : %s', container['Id'], ip_address)
             with open(os.path.join(configuration.hosts_dir, "docker-" + container['Id']), 'w') as f:
                 f.write('address=/{0}.{2}/{1}\n'.format(dpath.util.get(container, 'Name').replace('/', '').replace('_', '-'), ip_address, configuration.hosts_domain_name))
         except KeyError:

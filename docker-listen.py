@@ -85,9 +85,9 @@ def main(arguments):
     try:
         for event in events:
             logging.debug(event)
-            if event['status'] == 'start':
+            if event['Action'] == 'connect':
                 handle_start(configuration, client, event)
-            elif event['status'] == 'kill':
+            elif event['Action'] == 'disconnect':
                 handle_stop(configuration, client, event)
     except Exception:
         logging.exception('Error processing docker events. Stopping.')
@@ -123,7 +123,7 @@ def init_all(configuration, client):
 
 def handle_start(configuration, client, start_event):
     try:
-        inspect = client.inspect_container(start_event['id'])
+        inspect = client.inspect_container(start_event['Actor']['Attributes']['container'])
         handle_add_container(configuration, inspect)
         sighup_dnsmasq(configuration)
     except Exception:
@@ -131,10 +131,10 @@ def handle_start(configuration, client, start_event):
 
 def handle_stop(configuration, client, stop_event):
     try:
-        handle_stop_container(configuration, stop_event['id'])
+        handle_stop_container(configuration, stop_event['Actor']['Attributes']['container'])
         sighup_dnsmasq(configuration)
     except Exception:
-        logging.exception('Unexpected error processing %s', pprint.pformat(start_event))
+        logging.exception('Unexpected error processing %s', pprint.pformat(stop_event))
 
 def handle_stop_container(configuration, container_id):
     try:

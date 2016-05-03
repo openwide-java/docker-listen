@@ -1,0 +1,12 @@
+[Unit]
+Description=Docker listener for dnsmaq
+Wants=docker.service dnsmasq.service
+After=docker.service dnsmasq.service
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/data/services/docker-listen/docker-listen-pyenv/bin/python /data/services/docker-listen/docker-listen.py
+
+[Install]
+WantedBy=multi-user.target

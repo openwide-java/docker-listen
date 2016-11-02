@@ -40,9 +40,21 @@ Run the following command :
 Running as a service
 ====================
 
-Copy the file ``pstart/docker-listen.conf`` in ``/etc/init``.
+Using upstart
+-------------
+
+Copy the file ``upstart/docker-listen.conf`` in ``/etc/init``.
 
 Configure the path to docker-listen in ``/etc/init/docker-listen.conf`` and start the service with ``service docker-listen start``.
+
+Using Systemd
+-------------
+
+Copy the file ``systemd/docker-listen.service`` in ``/etc/systemd/system``.
+
+Copy the file ``systemd/docker-listen`` in ``/etc/default``.
+
+Run command ``systemctl enable docker-listen.service``.
 
 Configuration
 =============

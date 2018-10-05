@@ -1,3 +1,8 @@
+Discontinued
+============
+This repository is no longer actively maintained. Please take a look at [mveyrenc's fork](https://github.com/mveyrenc/docker-listen) or [shavounet's fork](https://github.com/shavounet/docker-listen).
+
+
 Intro
 =====
 
